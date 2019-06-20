@@ -1,5 +1,5 @@
 ! This program tests ELPA.
-program test_elpa_cmplx
+program test_mpi_real
 
    use ELPA
    use MPI
@@ -41,22 +41,20 @@ program test_elpa_cmplx
    real(dp) :: myerr
    real(dp) :: err1
    real(dp) :: err2
-   complex(dp) :: aux
 
    integer, allocatable :: seed(:)
 
-   real(dp), allocatable :: help(:,:)
-   complex(dp), allocatable :: mat(:,:)
-   complex(dp), allocatable :: tmp(:,:)
-   complex(dp), allocatable :: evec(:,:)
+   real(dp), allocatable :: mat(:,:)
+   real(dp), allocatable :: tmp(:,:)
+   real(dp), allocatable :: evec(:,:)
    real(dp), allocatable :: eval(:)
 
    class(elpa_t), pointer :: eh
 
    integer, external :: numroc
 
-   complex(dp), parameter :: zero = (0.0_dp,0.0_dp)
-   complex(dp), parameter :: one = (1.0_dp,0.0_dp)
+   real(dp), parameter :: zero = 0.0_dp
+   real(dp), parameter :: one = 1.0_dp
 
    ! Initialize MPI
    call MPI_Init(ierr)
@@ -125,25 +123,22 @@ program test_elpa_cmplx
    call random_seed(size=n)
 
    allocate(seed(n))
-   allocate(help(nlrow,nlcol))
    allocate(mat(nlrow,nlcol))
    allocate(tmp(nlrow,nlcol))
 
    seed = myid
 
    call random_seed(put=seed)
-   call random_number(help)
+   call random_number(mat)
 
    ! Symmetrize test matrix
-   mat = help+(0.0_dp,1.0_dp)*help
    tmp = mat
 
-   call pztranc(n_basis,n_basis,one,tmp,1,1,desc,one,mat,1,1,desc)
+   call pdtran(n_basis,n_basis,one,tmp,1,1,desc,one,mat,1,1,desc)
 
    ! Save test matrix
    tmp = mat
 
-   deallocate(help)
    allocate(evec(nlrow,nlcol))
    allocate(eval(n_basis))
 
@@ -171,6 +166,8 @@ program test_elpa_cmplx
 
    if(ierr /= 0) then
       write(*,"(2X,A)") "Error: setup"
+      call MPI_Abort(comm,0,ierr)
+      stop
    end if
 
    if(method == 1) then
@@ -198,6 +195,8 @@ program test_elpa_cmplx
 
    if(ierr /= 0) then
       write(*,"(2X,A)") "Error: solve"
+      call MPI_Abort(comm,0,ierr)
+      stop
    end if
 
    if(myid == 0) then
@@ -213,24 +212,22 @@ program test_elpa_cmplx
    nullify(eh)
 
    ! Check A C - lambda C
-   call pzgemm("N","N",n_basis,n_states,n_basis,one,tmp,1,1,desc,evec,1,1,desc,&
+   call pdgemm("N","N",n_basis,n_states,n_basis,one,tmp,1,1,desc,evec,1,1,desc,&
         zero,mat,1,1,desc)
 
    tmp = evec
 
    do i = 1,n_states
-      aux = eval(i)
-
-      call pzscal(n_basis,aux,tmp,1,i,desc,1)
+      call pdscal(n_basis,eval(i),tmp,1,i,desc,1)
    end do
 
    tmp = tmp-mat
-   myerr = 0.0_dp
+   myerr = zero
 
    do i = 1,n_states
-      call pzdotc(n_basis,aux,tmp,1,i,desc,1,tmp,1,i,desc,1)
+      call pdnrm2(n_basis,err1,tmp,1,i,desc,1)
 
-      myerr = max(myerr,sqrt(real(aux,kind=dp)))
+      myerr = max(myerr,err1)
    enddo
 
    call MPI_Reduce(myerr,err1,1,MPI_REAL8,MPI_MAX,0,comm,ierr)
@@ -238,8 +235,8 @@ program test_elpa_cmplx
    ! Check I - C^T C
    tmp = zero
 
-   call pzlaset("U",n_states,n_states,zero,one,tmp,1,1,desc)
-   call pzherk("U","C",n_states,n_basis,-one,evec,1,1,desc,one,tmp,1,1,desc)
+   call pdlaset("U",n_states,n_states,zero,one,tmp,1,1,desc)
+   call pdsyrk("U","T",n_states,n_basis,-one,evec,1,1,desc,one,tmp,1,1,desc)
 
    myerr = maxval(abs(tmp))
 
