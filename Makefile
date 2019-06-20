@@ -6,10 +6,13 @@ ELPA_INC=-I/home/wy29/opt/$(ELPA_VER)/build/include/$(ELPA_VER)/modules
 ELPA_LIB=-L/home/wy29/opt/$(ELPA_VER)/build/lib -lelpa
 MATH_LIB=-L/opt/intel/mkl/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
 
-all: test_elpa.x
+SRC=test_elpa_real.f90 test_elpa_cmplx.f90
+EXE=$(SRC:.f90=.x)
 
-test_elpa.x: test_elpa.f90
+all: $(EXE)
+
+%.x: %.f90
 	$(FC) -o $@ $< $(ELPA_INC) $(ELPA_LIB) $(CUDA_LIB) $(MATH_LIB)
 
 clean:
-	rm -f test_elpa.x
+	rm -f *.x
