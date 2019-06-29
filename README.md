@@ -31,12 +31,18 @@ the usage of GPU acceleration in steps 1-3 and 5.
 ## How to reproduce
 
 1. [Download](https://gitlab.mpcdf.mpg.de/elpa/elpa) and install ELPA. This
-reproducer should work with the following versions of ELPA: 2018.05.001,
-2018.11.001, 2019.05.001.rc1. MPI and GPU (CUDA) must be enabled for ELPA.
+reproducer should work with the following versions of ELPA: 2018.05, 2018.11,
+2019.05. GPU (CUDA) must be enabled for ELPA. MPI can be enabled optionally.
 
-2. Compile this test program. A simple Makefile is provided.
+2. There are four test cases:
+  * serial real
+  * serial complex
+  * MPI real
+  * MPI complex
 
-3. Run the `test_elpa.x` executable. It expects 5 command line arguments:
+They may be found in the subfolders, with simple makefiles provided.
+
+3. Each test program expects 5 command line arguments:
   * arg 1: Size of test matrix
   * arg 2: Number of eigenvectors to compute
   * arg 3: Block size of BLACS style 2D block-cyclic distribution
@@ -49,5 +55,9 @@ to (C^T C - I).
 
 5. The bug may be reproduced by, e.g.,
 ```
-mpirun -n 16 ./test_elpa.x 2000 1000 128 2 2
+mpirun -n 16 ./test_mpi_real.x 2000 1000 128 2 2
+```
+or
+```
+./test_serial_real.x 200 200 128 2 2
 ```
