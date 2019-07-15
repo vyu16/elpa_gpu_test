@@ -22,8 +22,6 @@ program test_serial_cmplx
    integer :: n
    integer :: i
 
-   real(dp) :: t1
-   real(dp) :: t2
    real(dp) :: err1
    real(dp) :: err2
    complex(dp) :: aux
@@ -130,11 +128,9 @@ program test_serial_cmplx
 
    if(cpu == 1) then
       call eh%set("gpu",0,ierr)
-      call eh%set("real_kernel",ELPA_2STAGE_REAL_GENERIC,ierr)
       call eh%set("complex_kernel",ELPA_2STAGE_COMPLEX_GENERIC,ierr)
    else
       call eh%set("gpu",1,ierr)
-      call eh%set("real_kernel",ELPA_2STAGE_REAL_GPU,ierr)
       call eh%set("complex_kernel",ELPA_2STAGE_COMPLEX_GPU,ierr)
    end if
 
