@@ -144,7 +144,11 @@ program test_mpi_real
 
    if(myid == 0) then
       write(*,*)
-      write(*,"(2X,A)") "Test matrix generated"
+      write(*,"(2X,A)") "Real test matrix generated"
+      write(*,"(2X,A,I10)") "| Matrix size  :",n_basis
+      write(*,"(2X,A,I10)") "| Eigenvectors :",n_states
+      write(*,"(2X,A,I10)") "| Block size   :",blk
+      write(*,"(2X,A,I10)") "| MPI tasks    :",n_proc
       write(*,*)
    end if
 
@@ -179,11 +183,9 @@ program test_mpi_real
    if(cpu == 1) then
       call eh%set("gpu",0,ierr)
       call eh%set("real_kernel",ELPA_2STAGE_REAL_GENERIC,ierr)
-      call eh%set("complex_kernel",ELPA_2STAGE_COMPLEX_GENERIC,ierr)
    else
       call eh%set("gpu",1,ierr)
       call eh%set("real_kernel",ELPA_2STAGE_REAL_GPU,ierr)
-      call eh%set("complex_kernel",ELPA_2STAGE_COMPLEX_GPU,ierr)
    end if
 
    t1 = MPI_Wtime()
@@ -203,7 +205,7 @@ program test_mpi_real
       write(*,"(2X,A)") "ELPA solver finished"
       write(*,"(2X,A,F10.3,A)") "| Time  :",t2-t1,"s"
 
-!      call eh%print_times()
+      call eh%print_times()
    end if
 
    ! Finalize ELPA
@@ -228,7 +230,7 @@ program test_mpi_real
       call pdnrm2(n_basis,err1,tmp,1,i,desc,1)
 
       myerr = max(myerr,err1)
-   enddo
+   end do
 
    call MPI_Reduce(myerr,err1,1,MPI_REAL8,MPI_MAX,0,comm,ierr)
 
@@ -244,6 +246,9 @@ program test_mpi_real
 
    if(myid == 0) then
       write(*,"(2X,A,E10.2,A,E10.2)") "| Error :",err1,";",err2
+      if(err1 > 1.e-9_dp .or. err2 > 1.e-11_dp) then
+         write(*,"(2X,A)") "Failed!!"
+      end if
       write(*,*)
    end if
 

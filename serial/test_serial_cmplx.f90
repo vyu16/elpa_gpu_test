@@ -99,7 +99,10 @@ program test_serial_cmplx
    allocate(eval(n_basis))
 
    write(*,*)
-   write(*,"(2X,A)") "Test matrix generated"
+   write(*,"(2X,A)") "Complex test matrix generated"
+   write(*,"(2X,A,I10)") "| Matrix size  :",n_basis
+   write(*,"(2X,A,I10)") "| Eigenvectors :",n_states
+   write(*,"(2X,A,I10)") "| Block size   :",blk
    write(*,*)
 
    ! Initialize ELPA
@@ -144,7 +147,7 @@ program test_serial_cmplx
 
    write(*,"(2X,A)") "ELPA solver finished"
 
-!   call eh%print_times()
+   call eh%print_times()
 
    ! Finalize ELPA
    call elpa_deallocate(eh)
@@ -166,9 +169,8 @@ program test_serial_cmplx
 
    do i = 1,n_states
       aux = zdotc(n_basis,tmp(:,i),1,tmp(:,i),1)
-
       err1 = max(err1,sqrt(real(aux,kind=dp)))
-   enddo
+   end do
 
    ! Check I - C^T C
    tmp = zero
@@ -178,8 +180,10 @@ program test_serial_cmplx
 
    err2 = maxval(abs(tmp))
 
-   write(*,"(2X,A,E10.2,A,E10.2)") "| Error :",err1,";",err2
-   write(*,*)
+   write(*,"(2X,A,E10.2,A,E10.2)") "Error :",err1,";",err2
+   if(err1 > 1.e-9_dp .or. err2 > 1.e-11_dp) then
+      write(*,"(2X,A)") "Failed!!"
+   end if
 
    deallocate(mat)
    deallocate(eval)
