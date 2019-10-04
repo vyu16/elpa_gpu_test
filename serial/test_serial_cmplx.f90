@@ -189,5 +189,6 @@ program test_serial_cmplx
    deallocate(eval)
    deallocate(evec)
    deallocate(tmp)
+   deallocate(seed)
 
 end program

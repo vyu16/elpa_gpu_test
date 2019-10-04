@@ -126,7 +126,7 @@ program test_mpi_real
    allocate(mat(nlrow,nlcol))
    allocate(tmp(nlrow,nlcol))
 
-   seed = myid
+   seed = myid+1
 
    call random_seed(put=seed)
    call random_number(mat)
@@ -256,6 +256,7 @@ program test_mpi_real
    deallocate(eval)
    deallocate(evec)
    deallocate(tmp)
+   deallocate(seed)
 
    call BLACS_Gridexit(ctxt)
    call BLACS_Exit(1)

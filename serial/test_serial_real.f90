@@ -185,5 +185,6 @@ program test_serial_real
    deallocate(eval)
    deallocate(evec)
    deallocate(tmp)
+   deallocate(seed)
 
 end program

@@ -129,7 +129,7 @@ program test_mpi_cmplx
    allocate(tmp(nlrow,nlcol))
    allocate(help(nlrow,nlcol))
 
-   seed = myid
+   seed = myid+1
 
    call random_seed(put=seed)
    call random_number(help)
@@ -263,6 +263,7 @@ program test_mpi_cmplx
    deallocate(eval)
    deallocate(evec)
    deallocate(tmp)
+   deallocate(seed)
 
    call BLACS_Gridexit(ctxt)
    call BLACS_Exit(1)
