@@ -1,10 +1,8 @@
 ## Background
 
-It appears that there is a bug in the GPU-accelerated version of the ELPA
-2-stage eigensolver (aka ELPA2). This is a mini reproducer adapted from the test
-program of the 2013 version of ELPA.
-
-ELPA2 features a unique 2-stage diagonalization that solves a standard symmetric
+This is a mini-app to test the performance of the ELPA eigensolver library. It
+is adapted from the test program of the 2013 release of ELPA. The ELPA2 solver
+features a unique two-stage diagonalization that solves a standard symmetric
 (Hermitian) eigenproblem (A C = C lambda) in 5 computational steps.
 
 1. Transform A to banded matrix B
@@ -13,51 +11,40 @@ ELPA2 features a unique 2-stage diagonalization that solves a standard symmetric
 4. Back-transform eigenvectors to B
 5. Back-transform eigenvectors to A
 
-All 5 steps can be GPU-accelerated. To use the GPU kernel of step 4, the block
-size of the BLACS style 2D block-cyclic distribution must be 128. When this is
-not the case, step 4 will be executed on CPU.
+## How to use
 
-We believe there is a bug in the GPU code of step 4, because
+1. [Download](https://gitlab.mpcdf.mpg.de/elpa/elpa) and install ELPA. The
+   following versions of ELPA are compatible with this app: 2018.05, 2018.11,
+   and 2019.05. GPU (CUDA) must be enabled for ELPA. MPI may be enabled
+   optionally.
 
-1. The eigenvalues are always correct regardless of the usage of GPU in each
-individual step.
-2. The eigenvalues and eigenvectors are always correct regardless of the usage
-of GPU acceleration in steps 1-3 and 5, as long as GPU acceleration for step 4
-is not enabled.
-3. When GPU acceleration for step 4 is enabled, the eigenvectors are incorrect
-for some specific combination of matrix size and process count, regardless of
-the usage of GPU acceleration in steps 1-3 and 5.
+2. Four test cases may be found in the subfolders, with simple makefiles
+   provided. The test cases are:
 
-## How to reproduce
-
-1. [Download](https://gitlab.mpcdf.mpg.de/elpa/elpa) and install ELPA. This
-reproducer should work with the following versions of ELPA: 2018.05, 2018.11,
-2019.05. GPU (CUDA) must be enabled for ELPA. MPI can be enabled optionally.
-
-2. There are four test cases:
   * serial real
   * serial complex
   * MPI real
   * MPI complex
 
-They may be found in the subfolders, with simple makefiles provided.
+3. Each test expects 5 command line arguments:
 
-3. Each test program expects 5 command line arguments:
   * arg 1: Size of test matrix
   * arg 2: Number of eigenvectors to compute
   * arg 3: Block size of BLACS style 2D block-cyclic distribution
   * arg 4: 1 for ELPA 1-stage solver, 2 for ELPA 2-stage solver
   * arg 5: 1 for CPU-only, 2 for GPU acceleration
 
-4. The test program reports total time to solution as well as two measures of
-error. The first one corresponds to (AC - C lambda), the second one corresponds
-to (C^T C - I).
+4. The mini-app reports total time to solution as well as two measures of error,
+   namely (AC - C lambda) and (C^T C - I). Both should be small.
 
-5. The bug may be reproduced by, e.g.,
-```
-mpirun -n 16 ./test_mpi_real.x 2000 1000 128 2 2
-```
-or
+## Examples
+
+1. Serial:
 ```
 ./test_serial_real.x 200 200 128 2 2
+```
+
+2. MPI:
+```
+mpirun -n 16 ./test_mpi_real.x 2000 1000 128 2 2
 ```
