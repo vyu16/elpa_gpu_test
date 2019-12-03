@@ -25,7 +25,6 @@ program test_mpi_real
    integer :: blk
    integer :: ctxt
    integer :: desc(9)
-   integer :: info
    integer :: n_basis
    integer :: n_states
    integer :: method
@@ -63,12 +62,12 @@ program test_mpi_real
    call MPI_Comm_rank(comm,myid,ierr)
 
    ! Read command line arguments
-   if(COMMAND_ARGUMENT_COUNT() == 5) then
-      call GET_COMMAND_ARGUMENT(1,arg1)
-      call GET_COMMAND_ARGUMENT(2,arg2)
-      call GET_COMMAND_ARGUMENT(3,arg3)
-      call GET_COMMAND_ARGUMENT(4,arg4)
-      call GET_COMMAND_ARGUMENT(5,arg5)
+   if(command_argument_count() == 5) then
+      call get_command_argument(1,arg1)
+      call get_command_argument(2,arg2)
+      call get_command_argument(3,arg3)
+      call get_command_argument(4,arg4)
+      call get_command_argument(5,arg5)
 
       read(arg1,*) n_basis
       if(n_basis <= 0) then
@@ -117,7 +116,7 @@ program test_mpi_real
 
    ldm = max(nlrow,1)
 
-   call descinit(desc,n_basis,n_basis,blk,blk,0,0,ctxt,ldm,info)
+   call descinit(desc,n_basis,n_basis,blk,blk,0,0,ctxt,ldm,ierr)
 
    ! Generate a random matrix
    call random_seed(size=n)

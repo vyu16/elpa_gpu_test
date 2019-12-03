@@ -42,12 +42,12 @@ program test_serial_cmplx
    complex(dp), parameter :: one = (1.0_dp,0.0_dp)
 
    ! Read command line arguments
-   if(COMMAND_ARGUMENT_COUNT() == 5) then
-      call GET_COMMAND_ARGUMENT(1,arg1)
-      call GET_COMMAND_ARGUMENT(2,arg2)
-      call GET_COMMAND_ARGUMENT(3,arg3)
-      call GET_COMMAND_ARGUMENT(4,arg4)
-      call GET_COMMAND_ARGUMENT(5,arg5)
+   if(command_argument_count() == 5) then
+      call get_command_argument(1,arg1)
+      call get_command_argument(2,arg2)
+      call get_command_argument(3,arg3)
+      call get_command_argument(4,arg4)
+      call get_command_argument(5,arg5)
 
       read(arg1,*) n_basis
       if(n_basis <= 0) then

@@ -2,7 +2,7 @@ FC = mpiifort
 FFLAGS = -O3
 
 CUDA_LIB = -L/usr/local/cuda-10.1/lib64 -lcublas -lcudart
-ELPA_VER = 2019.05.001
+ELPA_VER = 2019.05.002
 ELPA_INC = -I/home/wy29/opt/elpa-$(ELPA_VER)/build_gpu/include/elpa-$(ELPA_VER)/modules
 ELPA_LIB = -L/home/wy29/opt/elpa-$(ELPA_VER)/build_gpu/lib -lelpa
 MATH_LIB = -L/opt/intel/mkl/lib/intel64 -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
